@@ -8,22 +8,38 @@ movies = json.loads(movies_path.read_text())
 # movies = json.loads(movies)
 
 
-with sqlite3.connect("movies1.db") as conn:
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS movies (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            year INTEGER NOT NULL
-            
-        )
-        """
-    )
-
-    for movie in movies:
+def ConnectToDatabase():
+    with sqlite3.connect("movies1.db") as conn:
+        cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO movies (title, year) VALUES (?, ?)",
-            (movie["title"], movie["year"]),
+            """
+            CREATE TABLE IF NOT EXISTS movies (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                year INTEGER NOT NULL
+                
+            )
+            """
         )
-print("Creating database and table...", movies)
+
+        for movie in movies:
+            cursor.execute(
+                "INSERT INTO movies (title, year) VALUES (?, ?)",
+                (movie["title"], movie["year"]),
+            )
+    print("Creating database and table...", movies)
+
+
+ConnectToDatabase()
+
+
+def ReadFromDatabase():
+    with sqlite3.connect("movies1.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM movies")
+        rows = cursor.fetchall()
+        for row in rows:
+            print(row)
+
+
+ReadFromDatabase()
